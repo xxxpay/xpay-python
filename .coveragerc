@@ -1,0 +1,11 @@
+[paths]
+source =
+    xpay
+    */site-packages
+
+[run]
+branch = true
+parallel = true
+source = xpay
+omit =
+    xpay/six.py

@@ -1,0 +1,20 @@
+{
+  // Show the path in the top window bar.
+  "window.title": "${rootName}${separator}${activeEditorMedium}",
+
+  "editor.renderWhitespace": "all",
+  "files.exclude": {
+    "**/*.pyc": { "when": "$(basename).py" },
+    "**/__pycache__": true
+  },
+
+  // Formatting
+  "editor.formatOnSave": true,
+
+  // Tests
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+
+  "python.terminal.activateEnvironment": true,
+  "python.defaultInterpreterPath": "~/venv/bin/python3"
+}
