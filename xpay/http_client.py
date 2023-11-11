@@ -292,7 +292,7 @@ class HTTPClient(object):
             telemetry = {
                 "last_request_metrics": last_request_metrics.payload()
             }
-            headers["X-XPay-Client-Telemetry"] = json.dumps(telemetry)
+            headers["X-Stripe-Client-Telemetry"] = json.dumps(telemetry)
 
     def _record_request_metrics(self, response, request_start):
         _, _, rheaders = response
@@ -361,7 +361,7 @@ class RequestsClient(HTTPClient):
             except TypeError as e:
                 raise TypeError(
                     "Warning: It looks like your installed version of the "
-                    '"requests" library is not compatible with XPay\'s '
+                    '"requests" library is not compatible with Stripe\'s '
                     "usage thereof. (HINT: The most likely cause is that "
                     'your "requests" library is out of date. You can fix '
                     'that by running "pip install -U requests".) The '
@@ -390,10 +390,10 @@ class RequestsClient(HTTPClient):
         # but we don't want to retry
         if isinstance(e, self.requests.exceptions.SSLError):
             msg = (
-                "Could not verify XPay's SSL certificate.  Please make "
+                "Could not verify Stripe's SSL certificate.  Please make "
                 "sure that your network is not intercepting certificates.  "
                 "If this problem persists, let us know at "
-                "support@xpay.com."
+                "support@Stripe.com."
             )
             err = "%s: %s" % (type(e).__name__, str(e))
             should_retry = False
@@ -406,27 +406,27 @@ class RequestsClient(HTTPClient):
             ),
         ):
             msg = (
-                "Unexpected error communicating with XPay.  "
+                "Unexpected error communicating with Stripe.  "
                 "If this problem persists, let us know at "
-                "support@xpay.com."
+                "support@Stripe.com."
             )
             err = "%s: %s" % (type(e).__name__, str(e))
             should_retry = True
         # Catch remaining request exceptions
         elif isinstance(e, self.requests.exceptions.RequestException):
             msg = (
-                "Unexpected error communicating with XPay.  "
+                "Unexpected error communicating with Stripe.  "
                 "If this problem persists, let us know at "
-                "support@xpay.com."
+                "support@Stripe.com."
             )
             err = "%s: %s" % (type(e).__name__, str(e))
             should_retry = False
         else:
             msg = (
-                "Unexpected error communicating with XPay. "
+                "Unexpected error communicating with Stripe. "
                 "It looks like there's probably a configuration "
                 "issue locally.  If this problem persists, let us "
-                "know at support@xpay.com."
+                "know at support@Stripe.com."
             )
             err = "A %s was raised" % (type(e).__name__,)
             if str(e):
@@ -456,13 +456,13 @@ class UrlFetchClient(HTTPClient):
         if proxy:
             raise ValueError(
                 "No proxy support in urlfetch library. "
-                "Set xpay.default_http_client to either RequestsClient, "
+                "Set Stripe.default_http_client to either RequestsClient, "
                 "PycurlClient, or Urllib2Client instance to use a proxy."
             )
 
         self._verify_ssl_certs = verify_ssl_certs
         # GAE requests time out after 60 seconds, so make sure to default
-        # to 55 seconds to allow for a slow XPay
+        # to 55 seconds to allow for a slow Stripe
         self._deadline = deadline
 
         assert urlfetch is not None
@@ -486,7 +486,7 @@ class UrlFetchClient(HTTPClient):
                 headers=headers,
                 # Google App Engine doesn't let us specify our own cert bundle.
                 # However, that's ok because the CA bundle they use recognizes
-                # api.xpay.com.
+                # api.stripe.com.
                 validate_certificate=self._verify_ssl_certs,
                 deadline=self._deadline,
                 payload=post_data,
@@ -504,23 +504,23 @@ class UrlFetchClient(HTTPClient):
     def _handle_request_error(self, e, url) -> NoReturn:
         if isinstance(e, self.urlfetch.InvalidURLError):
             msg = (
-                "The XPay library attempted to fetch an "
+                "The Stripe library attempted to fetch an "
                 "invalid URL (%r). This is likely due to a bug "
-                "in the XPay Python bindings. Please let us know "
-                "at support@xpay.com." % (url,)
+                "in the Stripe Python bindings. Please let us know "
+                "at support@Stripe.com." % (url,)
             )
         elif isinstance(e, self.urlfetch.DownloadError):
-            msg = "There was a problem retrieving data from XPay."
+            msg = "There was a problem retrieving data from Stripe."
         elif isinstance(e, self.urlfetch.ResponseTooLargeError):
             msg = (
                 "There was a problem receiving all of your data from "
-                "XPay.  This is likely due to a bug in XPay. "
-                "Please let us know at support@xpay.com."
+                "Stripe.  This is likely due to a bug in Stripe. "
+                "Please let us know at support@Stripe.com."
             )
         else:
             msg = (
-                "Unexpected error communicating with XPay. If this "
-                "problem persists, let us know at support@xpay.com."
+                "Unexpected error communicating with Stripe. If this "
+                "problem persists, let us know at support@Stripe.com."
             )
 
         msg = textwrap.fill(msg) + "\n\n(Network error: " + str(e) + ")"
@@ -647,11 +647,11 @@ class PycurlClient(HTTPClient):
             self.pycurl.E_OPERATION_TIMEOUTED,
         ]:
             msg = (
-                "Could not connect to XPay.  Please check your "
+                "Could not connect to Stripe.  Please check your "
                 "internet connection and try again.  If this problem "
-                "persists, you should check XPay's service status at "
-                "https://twitter.com/xpaystatus, or let us know at "
-                "support@xpay.com."
+                "persists, you should check Stripe's service status at "
+                "https://twitter.com/Stripestatus, or let us know at "
+                "support@stripe.com."
             )
             should_retry = True
         elif e.args[0] in [
@@ -659,16 +659,16 @@ class PycurlClient(HTTPClient):
             self.pycurl.E_SSL_PEER_CERTIFICATE,
         ]:
             msg = (
-                "Could not verify XPay's SSL certificate.  Please make "
+                "Could not verify Stripe's SSL certificate.  Please make "
                 "sure that your network is not intercepting certificates.  "
                 "If this problem persists, let us know at "
-                "support@xpay.com."
+                "support@stripe.com."
             )
             should_retry = False
         else:
             msg = (
-                "Unexpected error communicating with XPay. If this "
-                "problem persists, let us know at support@xpay.com."
+                "Unexpected error communicating with Stripe. If this "
+                "problem persists, let us know at support@stripe.com."
             )
             should_retry = False
 
@@ -750,8 +750,8 @@ class Urllib2Client(HTTPClient):
 
     def _handle_request_error(self, e) -> NoReturn:
         msg = (
-            "Unexpected error communicating with XPay. "
-            "If this problem persists, let us know at support@xpay.com."
+            "Unexpected error communicating with Stripe. "
+            "If this problem persists, let us know at support@stripe.com."
         )
         msg = textwrap.fill(msg) + "\n\n(Network error: " + str(e) + ")"
         raise error.APIConnectionError(msg)

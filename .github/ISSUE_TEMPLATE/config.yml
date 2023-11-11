@@ -1,8 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: XPay support
-    url: https://support.xpay.com/
-    about: |
-      Please only file issues here that you believe represent actual bugs or feature requests for the XPay Python library.
-
-      If you're having general trouble with your XPay integration, please reach out to support.
