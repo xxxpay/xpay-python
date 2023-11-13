@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 api_key: Optional[str] = None
 client_id: Optional[str] = None
-api_base: str = "https://pay.stripe.com"
+api_base: str = "https://pay.openbot.com"
 connect_api_base: str = "https://connect.stripe.com"
 upload_api_base: str = "https://files.stripe.com"
 api_version: str = _ApiVersion.CURRENT
